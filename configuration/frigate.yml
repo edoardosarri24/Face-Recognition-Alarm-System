@@ -32,5 +32,4 @@ cameras:
       entrance_zone:
         coordinates: 10,10, 600,10, 600,300, 10,300
     motion:
-      mask:
-        - 0,0, 100,0, 100,100, 0,100
+      mask: 0,0, 100,0, 100,100, 0,100

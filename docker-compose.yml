@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   frigate:
     container_name: FRAS-frigate
@@ -101,6 +99,8 @@ services:
       - compreface-admin
     environment:
       - CLIENT_MAX_BODY_SIZE=10M
+      - PROXY_READ_TIMEOUT=60000ms
+      - PROXY_CONNECT_TIMEOUT=10000ms
     networks:
       - FRAS-network
 
