@@ -1,16 +1,16 @@
 mqtt:
   host: mqtt
   topic: frigate/events
-  user: "mqtt_user"
-  password: "mqtt_password"
+  user: ${MQTT_USER}
+  password: ${MQTT_PASSWORD}
 
 frigate:
   url: http://frigate:5000
 
 detectors:
   compreface:
-    url: http://compreface-fe:80
-    key: YOUR-COMPREFACE-API-KEY-HERE
+    url: http://compreface-front-end:80
+    key: ${COMPREFACE_API_KEY}
     timeout: 10
     det_prob_threshold: 0.8
     recognition_prob_threshold: 0.8

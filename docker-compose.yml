@@ -20,6 +20,12 @@ services:
     shm_size: "128mb"
     devices:
       - /dev/dri:/dev/dri # Hardware Acceleration for UGREEN NAS CPU TODO
+    environment:
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - CAMERA_IP=${CAMERA_IP}
+      - CAMERA_USER=${CAMERA_USER}
+      - CAMERA_PASSWORD=${CAMERA_PASSWORD}
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./configuration/frigate.yml:/config/config.yml:ro
@@ -39,6 +45,10 @@ services:
     container_name: FRAS-double-take
     image: jakowenko/double-take:latest
     restart: unless-stopped
+    environment:
+      - MQTT_USER=${MQTT_USER}
+      - MQTT_PASSWORD=${MQTT_PASSWORD}
+      - COMPREFACE_API_KEY=${COMPREFACE_API_KEY}
     volumes:
       - ./double-take/.storage:/double-take/.storage
       - ./configuration/double-take.yml:/double-take/config.yml:ro
@@ -55,9 +65,9 @@ services:
     container_name: FRAS-compreface-postgres-db
     image: postgres:11.5
     environment:
-      - POSTGRES_USER=compreface
-      - POSTGRES_PASSWORD=compreface
-      - POSTGRES_DB=compreface
+      - POSTGRES_USER=${POSTGRES_USER:-compreface}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-compreface}
+      - POSTGRES_DB=${POSTGRES_DB:-compreface}
     volumes:
       - ./compreface/postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -72,9 +82,9 @@ services:
       - compreface-postgres-db
       - compreface-api
     environment:
-      - POSTGRES_USER=compreface
-      - POSTGRES_PASSWORD=compreface
-      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/compreface
+      - POSTGRES_USER=${POSTGRES_USER:-compreface}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-compreface}
+      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/${POSTGRES_DB:-compreface}
       - SPRING_PROFILES_ACTIVE=dev
       - ENABLE_EMAIL_SERVER=false
     networks:
@@ -87,9 +97,9 @@ services:
     depends_on:
       - compreface-postgres-db
     environment:
-      - POSTGRES_USER=compreface
-      - POSTGRES_PASSWORD=compreface
-      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/compreface
+      - POSTGRES_USER=${POSTGRES_USER:-compreface}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-compreface}
+      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/${POSTGRES_DB:-compreface}
       - SPRING_PROFILES_ACTIVE=dev
     networks:
       - FRAS-network

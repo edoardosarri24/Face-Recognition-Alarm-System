@@ -1,14 +1,14 @@
 mqtt:
   host: mqtt
-  user: "mqtt_user"
-  password: "mqtt_password"
+  user: "{MQTT_USER}"
+  password: "{MQTT_PASSWORD}"
 
 go2rtc:
   streams:
     tapo_main:
-      - rtsp://admin:password@192.168.1.100:554/stream1 # 2K QHD (4MP) main stream
+      - rtsp://{CAMERA_USER}:{CAMERA_PASSWORD}@{CAMERA_IP}:554/stream1 # 2K QHD (4MP) main stream
     tapo_sub:
-      - rtsp://admin:password@192.168.1.100:554/stream2 # Low resolution sub stream
+      - rtsp://{CAMERA_USER}:{CAMERA_PASSWORD}@{CAMERA_IP}:554/stream2 # Low resolution sub stream
 
 cameras:
   main_door:
