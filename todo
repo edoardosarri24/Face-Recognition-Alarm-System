@@ -1,0 +1,22 @@
+- controlla iGPU in nas con  ### 4. "Non ho una GPU collegata al mio NAS": cosa fare con devices: - /dev/dri:/dev/dri?                                                                  
+                                                                                                                                                             
+  Nei NAS (come gli UGREEN o Synology con processori Intel/AMD), per "GPU" si intende solitamente la GPU integrata nella CPU (iGPU), non una scheda video    
+  dedicata PCIe (come Nvidia o AMD Radeon). Il percorso /dev/dri è il driver grafico del kernel Linux (Direct Rendering Infrastructure) usato per QuickSync /
+  VAAPI.                                                                                                                                                     
+                                                                                                                                                             
+  • Come verificare se ce l'hai:                                                                                                                             
+  Collegati via SSH o terminale al tuo NAS ed esegui:                                                                                                        
+    ls -l /dev/dri                                                                                                                                           
+  Se la cartella esiste (vedrai dispositivi tipo card0 e renderD128), significa che la CPU ha la grafica integrata e puoi lasciarlo.                         
+  • Se NON esiste o il NAS ha una CPU ARM / senza grafica integrata:                                                                                         
+  Devi rimuovere o commentare quelle due righe da Frigate:                                                                                                   
+    # devices:
+    #   - /dev/dri:/dev/dri
+  
+  │ Warning
+  │ Se lasci devices: - /dev/dri:/dev/dri e il percorso non esiste sul NAS, il container di Frigate fallirà l'avvio con errore device not found. Senza GPU,  
+  │ Frigate utilizzerà semplicemente la CPU software per decodificare i flussi video.
+  
+
+
+  

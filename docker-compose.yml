@@ -1,0 +1,124 @@
+version: '3.9'
+
+services:
+  mqtt:
+    container_name: FRAS-mqtt-mosquitto
+    image: eclipse-mosquitto:2 # Stable version
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+    networks:
+      - FRAS-network
+
+  frigate:
+    container_name: FRAS-frigate
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "128mb"
+    devices:
+      - /dev/dri:/dev/dri # Hardware Acceleration for UGREEN NAS CPU TODO
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./frigate/config:/config
+      - ./frigate/storage:/media/frigate
+    ports:
+      - "5000:5000" # Web Interface
+      - "8554:8554" # Multiplexing go2rtc
+      - "8555:8555/tcp"
+      - "8555:8555/udp"
+    restart: unless-stopped
+    depends_on:
+      - mqtt
+    networks:
+      - FRAS-network
+
+  double-take:
+    container_name: FRAS-double-take
+    image: jakowenko/double-take:latest
+    restart: unless-stopped
+    volumes:
+      - ./double-take/.storage:/double-take/.storage
+      - ./double-take/config.yml:/double-take/config.yml
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mqtt
+      - frigate
+      - compreface-front-end
+    networks:
+      - FRAS-network
+
+  compreface-postgres-db:
+    container_name: FRAS-compreface-postgres-db
+    image: postgres:11.5
+    environment:
+      - POSTGRES_USER=compreface
+      - POSTGRES_PASSWORD=compreface
+      - POSTGRES_DB=compreface
+    volumes:
+      - ./compreface/postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - FRAS-network
+
+  compreface-admin:
+    container_name: FRAS-compreface-admin
+    image: exadel/compreface-admin:latest
+    restart: unless-stopped
+    depends_on:
+      - compreface-postgres-db
+      - compreface-api
+    environment:
+      - POSTGRES_USER=compreface
+      - POSTGRES_PASSWORD=compreface
+      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/compreface
+      - SPRING_PROFILES_ACTIVE=dev
+      - ENABLE_EMAIL_SERVER=false
+    networks:
+      - FRAS-network
+
+  compreface-api:
+    container_name: FRAS-compreface-api
+    image: exadel/compreface-api:latest
+    restart: unless-stopped
+    depends_on:
+      - compreface-postgres-db
+    environment:
+      - POSTGRES_USER=compreface
+      - POSTGRES_PASSWORD=compreface
+      - POSTGRES_URL=jdbc:postgresql://compreface-postgres-db:5432/compreface
+      - SPRING_PROFILES_ACTIVE=dev
+    networks:
+      - FRAS-network
+
+  compreface-front-end:
+    container_name: FRAS-compreface-front-end
+    image: exadel/compreface-fe:latest
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    depends_on:
+      - compreface-api
+      - compreface-admin
+    environment:
+      - CLIENT_MAX_BODY_SIZE=10M
+    networks:
+      - FRAS-network
+
+  compreface-core:
+    container_name: FRAS-compreface-core
+    image: exadel/compreface-core:latest
+    restart: unless-stopped
+    environment:
+      - ML_PORT=3000
+    ports:
+      - "3001:3000"
+    networks:
+      - FRAS-network
+
+networks:
+  FRAS-network:
+    driver: bridge

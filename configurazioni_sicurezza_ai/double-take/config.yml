@@ -1,0 +1,25 @@
+mqtt:
+  host: mqtt
+  topic: frigate/events
+  user: "mqtt_user"
+  password: "mqtt_password"
+
+frigate:
+  url: http://frigate:5000
+
+detectors:
+  compreface:
+    url: http://compreface-fe:80
+    key: YOUR-COMPREFACE-API-KEY-HERE
+    timeout: 10
+    det_prob_threshold: 0.8
+    recognition_prob_threshold: 0.8
+
+cameras:
+  main_door:
+    masks:
+      - coordinates: 0,0, 100,0, 100,100, 0,100
+    zones:
+      - entrance_zone
+    detect:
+      min_area: 5000
