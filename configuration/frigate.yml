@@ -1,5 +1,5 @@
 mqtt:
-  host: mqtt
+  host: "{MQTT_HOST}"
   user: "{MQTT_USER}"
   password: "{MQTT_PASSWORD}"
 
@@ -13,6 +13,7 @@ go2rtc:
 cameras:
   main_door:
     ffmpeg:
+      hwaccel_args: preset-vaapi
       inputs:
         - path: rtsp://127.0.0.1:8554/tapo_main
           roles:

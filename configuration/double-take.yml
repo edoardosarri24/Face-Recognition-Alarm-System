@@ -1,5 +1,5 @@
 mqtt:
-  host: mqtt
+  host: ${MQTT_HOST}
   topic: frigate/events
   user: ${MQTT_USER}
   password: ${MQTT_PASSWORD}
