@@ -22,7 +22,7 @@ services:
       - /dev/dri:/dev/dri # Hardware Acceleration for UGREEN NAS CPU TODO
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./frigate/config:/config
+      - ./configuration/frigate.yml:/config/config.yml:ro
       - ./frigate/storage:/media/frigate
     ports:
       - "5000:5000" # Web Interface
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./double-take/.storage:/double-take/.storage
-      - ./double-take/config.yml:/double-take/config.yml
+      - ./configuration/double-take.yml:/double-take/config.yml:ro
     ports:
       - "3000:3000"
     depends_on:

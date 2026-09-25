@@ -21,10 +21,12 @@ The software architecture is service-oriented, based on Docker. All components a
   - It asks for computation from one or more models and can perform a consensus operation (e.g., average) to increase the recall metrics. The challenge in this case will be to normalize multiple JSON results formatted in different ways.
   - It sends the result to one or more clients (e.g., HA).
 - **CompreFace**
-   [CompreFace](https://github.com/exadel-inc/CompreFace) is a modular stack based on a microservices architecture.
-   - Front-end: It is a graphical interface to create projects, handle face collections, and manage authentication.
-   - Database: It is an instance of PostgreSQL and implements a relational and vector database. It is used to collect the face information about the authenticated person.
-   - Inference Engine: It is the CompreFace core that exposes a REST API and executes the deep learning models at runtime. The recognition pipeline is the following: it finds the bounding box of the face; it performs an alignment; it extracts the features, the embedding of 512 dimensions; it performs the matching and returns a JSON with the person and the maximum cosine similarity found in the database.
+   [CompreFace](https://github.com/exadel-inc/CompreFace) is a modular stack based on a microservices architecture:
+   - Front-end (`compreface-front-end`): An Nginx-based web UI and reverse proxy / API gateway. It serves the dashboard to manage projects and face collections, and routes incoming traffic to the admin and API services.
+   - Admin (`compreface-admin`): A Spring Boot service managing administrative operations, applications, users, and API key generation.
+   - API (`compreface-api`): The backend service responsible for processing face recognition, detection, and verification requests, validating API keys, and communicating with the core engine.
+   - Inference Engine (`compreface-core`): The deep learning engine that executes AI models at runtime. The recognition pipeline detects face bounding boxes, performs alignment, extracts 512-dimensional embeddings, and computes cosine similarity against stored vectors.
+   - Database (`compreface-postgres-db`): A PostgreSQL database used to store users, applications, services, and facial embedding metadata.
 
 # Data Flow
 The camera data flow must be transformed into an output that can be useful for a client. This process defines various phases:
