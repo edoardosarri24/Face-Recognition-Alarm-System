@@ -6,24 +6,12 @@ on:
 
 jobs:
   deploy:
-    name: Deploy Stack on NAS
-    runs-on: ubuntu-latest
+    name: Deploy Stack on Local NAS
+    runs-on: self-hosted
     steps:
-      - name: SSH and Update Docker Containers
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.NAS_HOST }}
-          username: ${{ secrets.NAS_USER }}
-          key: ${{ secrets.NAS_SSH_KEY }}
-          port: ${{ secrets.NAS_PORT }}
-          script: |
-            echo "Navigating to project directory: ${{ secrets.NAS_PROJECT_PATH }}"
-            cd ${{ secrets.NAS_PROJECT_PATH }}
-            
-            echo "Pulling latest changes from repository..."
-            git pull origin main
-            
-            echo "Applying updated containers and configurations..."
-            docker compose up -d --remove-orphans
-            
-            echo "Deployment completed successfully!"
+      - name: Pull Latest Changes and Recreate Containers
+        run: |
+          cd /volume1/docker/Face-Recognition-Alarm-System
+          git pull origin main
+          docker compose up -d --remove-orphans
+
